@@ -1,0 +1,326 @@
+<?php
+class Veiculo {
+    private $conn;
+    private $table_name = "veiculos";
+    
+    public $id;
+    public $placa;
+    public $modelo;
+    public $marca;
+    public $ano;
+    public $km_atual;
+    public $status;
+    public $ativo;
+    
+    public function __construct($db) {
+        $this->conn = $db;
+    }
+    
+    // Criar veículo
+    public function criar() {
+        $query = "INSERT INTO " . $this->table_name . " 
+                  SET placa = :placa, modelo = :modelo, marca = :marca, 
+                  ano = :ano, km_atual = :km_atual, status = 'disponivel', ativo = 1";
+        
+        $stmt = $this->conn->prepare($query);
+        
+        // Sanitize
+        $this->placa = htmlspecialchars(strip_tags($this->placa));
+        $this->modelo = htmlspecialchars(strip_tags($this->modelo));
+        $this->marca = htmlspecialchars(strip_tags($this->marca));
+        $this->ano = htmlspecialchars(strip_tags($this->ano));
+        $this->km_atual = htmlspecialchars(strip_tags($this->km_atual));
+        
+        // Bind values
+        $stmt->bindParam(":placa", $this->placa);
+        $stmt->bindParam(":modelo", $this->modelo);
+        $stmt->bindParam(":marca", $this->marca);
+        $stmt->bindParam(":ano", $this->ano);
+        $stmt->bindParam(":km_atual", $this->km_atual);
+        
+        // Execute query
+        if($stmt->execute()) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // Atualizar veículo
+    public function atualizar() {
+        $query = "UPDATE " . $this->table_name . " 
+                  SET placa = :placa, modelo = :modelo, marca = :marca, 
+                  ano = :ano, km_atual = :km_atual 
+                  WHERE id = :id";
+        
+        $stmt = $this->conn->prepare($query);
+        
+        // Sanitize
+        $this->placa = htmlspecialchars(strip_tags($this->placa));
+        $this->modelo = htmlspecialchars(strip_tags($this->modelo));
+        $this->marca = htmlspecialchars(strip_tags($this->marca));
+        $this->ano = htmlspecialchars(strip_tags($this->ano));
+        $this->km_atual = htmlspecialchars(strip_tags($this->km_atual));
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        
+        // Bind values
+        $stmt->bindParam(":placa", $this->placa);
+        $stmt->bindParam(":modelo", $this->modelo);
+        $stmt->bindParam(":marca", $this->marca);
+        $stmt->bindParam(":ano", $this->ano);
+        $stmt->bindParam(":km_atual", $this->km_atual);
+        $stmt->bindParam(":id", $this->id);
+        
+        // Execute query
+        if($stmt->execute()) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // Excluir veículo
+    public function excluir() {
+        $query = "DELETE FROM " . $this->table_name . " WHERE id = ?";
+        
+        $stmt = $this->conn->prepare($query);
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        $stmt->bindParam(1, $this->id);
+        
+        if($stmt->execute()) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    // Excluir veículo forçadamente (remover todos os registros associados)
+    public function excluirForcar() {
+        // Primeiro exclui todos os registros relacionados
+        $queries = [
+            "DELETE FROM abastecimentos WHERE veiculo_id = ?",
+            "DELETE FROM manutencoes WHERE veiculo_id = ?",
+            "DELETE FROM uso_veiculos WHERE veiculo_id = ?"
+        ];
+        
+        foreach($queries as $query) {
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(1, $this->id);
+            $stmt->execute();
+        }
+        
+        // Depois exclui o veículo
+        return $this->excluir();
+    }
+    
+    // Desativar veículo
+    public function desativar() {
+        $query = "UPDATE " . $this->table_name . " SET ativo = 0 WHERE id = ?";
+        
+        $stmt = $this->conn->prepare($query);
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        $stmt->bindParam(1, $this->id);
+        
+        if($stmt->execute()) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // Reativar veículo
+    public function reativar() {
+        $query = "UPDATE " . $this->table_name . " SET ativo = 1 WHERE id = ?";
+        
+        $stmt = $this->conn->prepare($query);
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        $stmt->bindParam(1, $this->id);
+        
+        if($stmt->execute()) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // Ler um único veículo
+    public function ler() {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE id = ?";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $this->id);
+        $stmt->execute();
+        
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if($row) {
+            $this->id = $row['id'];
+            $this->placa = $row['placa'];
+            $this->modelo = $row['modelo'];
+            $this->marca = $row['marca'];
+            $this->ano = $row['ano'];
+            $this->km_atual = $row['km_atual'];
+            $this->status = $row['status'];
+            $this->ativo = $row['ativo'] ?? 1;
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // Listar todos os veículos
+    public function listar() {
+        $query = "SELECT * FROM " . $this->table_name . " ORDER BY placa";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        
+        return $stmt;
+    }
+    
+    // Listar veículos ativos
+    public function listarAtivos() {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE ativo = 1 ORDER BY placa";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        
+        return $stmt;
+    }
+    
+    // Listar veículos disponíveis
+    public function listarDisponiveis() {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE status = 'disponivel' AND ativo = 1 ORDER BY placa";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        
+        return $stmt;
+    }
+    
+    // Obter usuário que está usando o veículo
+    public function obterUsuarioEmUso() {
+        $query = "SELECT u.id, u.nome, uv.id as uso_id, uv.data_saida
+                  FROM uso_veiculos uv 
+                  JOIN usuarios u ON uv.usuario_id = u.id
+                  WHERE uv.veiculo_id = ? AND uv.data_retorno IS NULL";
+                  
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $this->id);
+        $stmt->execute();
+        
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    // Contar total de veículos
+    public function contarTotal() {
+        $query = "SELECT COUNT(*) as total FROM " . $this->table_name . " WHERE ativo = 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return $row['total'];
+    }
+    
+    // Contar veículos em manutenção
+    public function contarEmManutencao() {
+        $query = "SELECT COUNT(*) as total FROM " . $this->table_name . " WHERE status = 'manutencao' AND ativo = 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return $row['total'];
+    }
+    
+    // Contar veículos em uso
+    public function contarEmUso() {
+        $query = "SELECT COUNT(*) as total FROM " . $this->table_name . " WHERE status = 'em_uso' AND ativo = 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return $row['total'];
+    }
+    
+    // Atualizar status para manutenção
+    public function definirEmManutencao() {
+        $query = "UPDATE " . $this->table_name . " SET status = 'manutencao' WHERE id = :id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $this->id);
+        
+        return $stmt->execute();
+    }
+    
+    // Atualizar status para disponível
+    public function definirDisponivel() {
+        $query = "UPDATE " . $this->table_name . " SET status = 'disponivel' WHERE id = :id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $this->id);
+        
+        return $stmt->execute();
+    }
+    
+    // Atualizar status para em uso
+    public function definirEmUso() {
+        $query = "UPDATE " . $this->table_name . " SET status = 'em_uso' WHERE id = :id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $this->id);
+        
+        return $stmt->execute();
+    }
+    
+    // Atualizar KM
+    public function atualizarKM($novo_km) {
+        $query = "UPDATE " . $this->table_name . " SET km_atual = :km WHERE id = :id";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":km", $novo_km);
+        $stmt->bindParam(":id", $this->id);
+        
+        return $stmt->execute();
+    }
+    
+    // Obter estatísticas para relatórios
+    public function obterEstatisticas() {
+        $result = array();
+        
+        // Veículos por status
+        $query1 = "SELECT status, COUNT(*) as total FROM " . $this->table_name . " WHERE ativo = 1 GROUP BY status";
+        $stmt1 = $this->conn->prepare($query1);
+        $stmt1->execute();
+        $result['por_status'] = $stmt1->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Veículos por marca
+        $query2 = "SELECT marca, COUNT(*) as total FROM " . $this->table_name . " WHERE ativo = 1 GROUP BY marca ORDER BY total DESC";
+        $stmt2 = $this->conn->prepare($query2);
+        $stmt2->execute();
+        $result['por_marca'] = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Veículos por ano
+        $query3 = "SELECT ano, COUNT(*) as total FROM " . $this->table_name . " WHERE ativo = 1 GROUP BY ano ORDER BY ano DESC";
+        $stmt3 = $this->conn->prepare($query3);
+        $stmt3->execute();
+        $result['por_ano'] = $stmt3->fetchAll(PDO::FETCH_ASSOC);
+        
+        return $result;
+    }
+    
+    // Obter quilometragem média por veículo
+    public function obterKmMedia() {
+        $query = "SELECT v.placa, v.modelo, v.marca, v.km_atual, 
+                 (SELECT COUNT(*) FROM abastecimentos a WHERE a.veiculo_id = v.id) as total_abastecimentos,
+                 (SELECT COUNT(*) FROM manutencoes m WHERE m.veiculo_id = v.id) as total_manutencoes
+                 FROM " . $this->table_name . " v
+                 WHERE v.ativo = 1
+                 ORDER BY v.km_atual DESC";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
+?>

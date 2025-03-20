@@ -1,0 +1,236 @@
+/* Estilos Gerais */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fc;
+    overflow-x: hidden;
+    padding-top: 10px; /* Adicionar espaço para o navbar */
+}
+
+/* Estilos para o Navbar */
+.navbar-brand img {
+    max-height: 30px;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.dropdown-menu {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para links ativos no navbar */
+.navbar-dark .navbar-nav .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+/* Menu fixo no centro */
+.navbar .container {
+    max-width: 1400px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.navbar-collapse {
+    display: flex;
+    justify-content: center;
+    flex-grow: 0;
+}
+
+.navbar-nav.mx-auto {
+    width: auto;
+    display: flex;
+    justify-content: center;
+}
+
+/* Alinhamento dos itens do menu */
+.navbar-nav .nav-item {
+    margin: 0 6px;
+}
+
+.navbar-nav .nav-link {
+    padding: 8px 12px;
+    text-align: center;
+    white-space: nowrap;
+    min-width: 100px; /* Tamanho mínimo para evitar movimentação */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-nav .nav-link i {
+    margin-right: 6px;
+}
+
+/* Hover effect nos itens do menu */
+.navbar-dark .navbar-nav .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+/* Cards do Dashboard */
+.border-left-primary {
+    border-left: 4px solid #4e73df !important;
+}
+
+.border-left-success {
+    border-left: 4px solid #1cc88a !important;
+}
+
+.border-left-warning {
+    border-left: 4px solid #f6c23e !important;
+}
+
+.border-left-danger {
+    border-left: 4px solid #e74a3b !important;
+}
+
+/* Tabelas */
+.table {
+    background-color: #fff;
+}
+
+/* Botões de Ação */
+.table .btn {
+    margin: 0 2px;
+}
+
+/* Formulários */
+.form-label {
+    font-weight: 500;
+}
+
+/* Classes adicionais */
+.text-xs {
+    font-size: 0.8rem;
+}
+
+.font-weight-bold {
+    font-weight: 700 !important;
+}
+
+.text-gray-800 {
+    color: #2d3748 !important;
+}
+
+.text-gray-300 {
+    color: #cbd5e0 !important;
+}
+
+.text-uppercase {
+    text-transform: uppercase !important;
+}
+
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+}
+
+.no-gutters {
+    margin-right: 0;
+    margin-left: 0;
+}
+
+.no-gutters > .col,
+.no-gutters > [class*="col-"] {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+/* Personalização de cores */
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, .9);
+}
+
+.bg-primary {
+    background-color: #3490dc !important;
+}
+
+.bg-success {
+    background-color: #38c172 !important;
+}
+
+.bg-warning {
+    background-color: #ffed4a !important;
+    color: #2d3748 !important;
+}
+
+.bg-danger {
+    background-color: #e3342f !important;
+}
+
+.bg-info {
+    background-color: #6cb2eb !important;
+}
+
+.text-primary {
+    color: #3490dc !important;
+}
+
+.text-success {
+    color: #38c172 !important;
+}
+
+.text-warning {
+    color: #ffed4a !important;
+}
+
+.text-danger {
+    color: #e3342f !important;
+}
+
+.btn-primary {
+    background-color: #3490dc;
+    border-color: #3490dc;
+}
+
+.btn-primary:hover {
+    background-color: #2779bd;
+    border-color: #2779bd;
+}
+
+.btn-success {
+    background-color: #38c172;
+    border-color: #38c172;
+}
+
+.btn-success:hover {
+    background-color: #2d995b;
+    border-color: #2d995b;
+}
+
+.btn-danger {
+    background-color: #e3342f;
+    border-color: #e3342f;
+}
+
+.btn-danger:hover {
+    background-color: #cc1f1a;
+    border-color: #cc1f1a;
+}
+
+/* Responsividade para dispositivos móveis */
+@media (max-width: 991.98px) {
+    .navbar-collapse,
+    .navbar-nav.mx-auto {
+        width: 100%;
+        display: block;
+    }
+    
+    .navbar-nav .nav-item {
+        margin: 0;
+    }
+    
+    .navbar-nav .nav-link {
+        padding: 0.5rem 0;
+        min-width: 0;
+        text-align: left;
+        justify-content: flex-start;
+    }
+    
+    .navbar-dark .navbar-toggler {
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+}
